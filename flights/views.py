@@ -1,18 +1,26 @@
 from ast import Delete
 from .models import Booking, Flight
 from rest_framework.generics import ListAPIView, RetrieveAPIView, UpdateAPIView, DestroyAPIView
-from .serializers import FlightsListSerializer, BookingListSerializer, BookingUpdateSerializer
+from .serializers import FlightsListSerializer, BookingListSerializer, BookingUpdateSerializer, FlightsCreateSerializer
 from django.utils import timezone
 from rest_framework.generics import CreateAPIView
 from .serializers import UserCreateSerializer
 from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 from rest_framework.views import APIView
-
+from rest_framework.generics import ListAPIView, CreateAPIView, DestroyAPIView
 from .serializers import UserLoginSerializer
+from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
+
+
+class CreateFlightView(CreateAPIView):
+    queryset = Flight.objects.all()
+    serializer_class = FlightsCreateSerializer
+    permission_classes = [IsAuthenticated]
 
 
 class FlightListView(ListAPIView):
+
     queryset = Flight.objects.all()
     serializer_class = FlightsListSerializer
 
