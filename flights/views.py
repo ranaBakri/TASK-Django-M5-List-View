@@ -1,6 +1,7 @@
+from ast import Delete
 from .models import Booking, Flight
-from rest_framework.generics import ListAPIView, RetrieveAPIView, CreateAPIView
-from .serializers import FlightsListSerializer, BookingListSerializer
+from rest_framework.generics import ListAPIView, RetrieveAPIView, UpdateAPIView, DestroyAPIView
+from .serializers import FlightsListSerializer, BookingListSerializer, BookingUpdateSerializer
 from django.utils import timezone
 
 
@@ -27,5 +28,15 @@ class BookingDetailView(RetrieveAPIView):
     lookup_url_kwarg = 'object_id'
 
 
-class BookingCreateView(CreateAPIView):
+class BookingUpdateView(UpdateAPIView):
+    queryset = Booking.objects.all()
+    serializer_class = BookingUpdateSerializer
+    lookup_field = 'id'
+    lookup_url_kwarg = 'object_id'
+
+
+class BookingDeleteView(DestroyAPIView):
+    queryset = Booking.objects.all()
     serializer_class = BookingListSerializer
+    lookup_field = 'id'
+    lookup_url_kwarg = 'object_id'
