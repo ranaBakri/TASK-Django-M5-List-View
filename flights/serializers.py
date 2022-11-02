@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from flights.models import Flight, Booking
+from django.contrib.auth import get_user_model
 
 
 class FlightsListSerializer(serializers.ModelSerializer):
@@ -18,3 +19,44 @@ class BookingUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Booking
         fields = ['date', 'passengers']
+
+
+User = get_user_model()
+
+
+class UserCreateSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True)
+
+    class Meta:
+        model = User
+        fields = ["username", "password", "first_name", "last_name"]
+
+    def create(self, validated_data):
+        username = validated_data["username"]
+        password = validated_data["password"]
+        new_user = User(username=username)
+        new_user.set_password(password)
+        new_user.save()
+        return validated_data
+
+
+class UserLoginSerializer(serializers.Serializer):
+    username = serializers.CharField()
+    password = serializers.CharField(write_only=True)
+
+    def validate(self, data):
+        username = data.get("username")
+        password = data.get("password")
+
+        try:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            raise serializers.ValidationError("This username does not exist")
+
+        if user.check_password(password):
+
+            return data
+
+        else:
+            raise serializers.ValidationError(
+                "Incorrect username/password combination!")
